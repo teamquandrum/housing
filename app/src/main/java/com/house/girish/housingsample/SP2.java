@@ -2,13 +2,23 @@ package com.house.girish.housingsample;
 
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.apache.http.Header;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -64,7 +74,7 @@ public class SP2 extends ActionBarActivity {
 
 
 
-        int openness, extraversion, concentiousness, agreeableness, neuroticism;
+        final int openness, extraversion, concentiousness, agreeableness, neuroticism;
 
         if(ho>lo)
         {
@@ -108,6 +118,75 @@ public class SP2 extends ActionBarActivity {
         }
 
         Log.e("the final shit", openness + " " + concentiousness + " " + extraversion + " " + agreeableness + " " + neuroticism);
+
+        Button btn = (Button)findViewById(R.id.button2);
+
+        btn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // TODO Auto-generated method stub
+
+
+
+                registerNow(openness, concentiousness, extraversion, agreeableness, neuroticism);
+
+            }
+        });
+    }
+
+    public void registerNow(int o, int c, int e, int a, int n) {
+
+
+        //Register with the Server
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+
+        params.put("controller", "user");
+        params.put("action", "newUser");
+        params.put("name", "Fill value obtained from user");
+        params.put("gender", "M");
+
+        params.put("openness", o);
+        params.put("conscience", c);
+        params.put("extroverted", e);
+        params.put("agreeable", a);
+        params.put("neurotic", n);
+
+        client.get("http://housinghack.gear.host/index.php/manager", params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+                Toast.makeText(getApplicationContext(), "Sending this shit",
+                        Toast.LENGTH_SHORT).show();
+                // called before request is started
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                // called when response HTTP status is "200 OK"
+                Toast.makeText(getApplicationContext(), new String(response),
+                        Toast.LENGTH_SHORT).show();
+                //Intent intent = new Intent(AskActivity.this, QAActivity.class);
+                //startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(getApplicationContext(), e.toString(),
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                Toast.makeText(getApplicationContext(), "Retrying",
+                        Toast.LENGTH_SHORT).show();
+                // called when request is retried
+            }
+        });
+
     }
 
     public int extraversion() throws IOException

@@ -148,6 +148,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+        showHashKey(this);
     }
 
     @Override
